@@ -142,3 +142,12 @@ dist
 .svelte-kit
 
 # End of https://www.toptal.com/developers/gitignore/api/node
+
+mongodb atlas
+userId
+ankit77003_db_user
+
+password
+ankitdb1234234
+
+mongodb+srv://<db_username>:<db_password>@cluster0.qiupkqt.mongodb.net/?appName=Cluster0
