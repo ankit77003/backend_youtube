@@ -3,12 +3,13 @@ import apiError from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
 import { uploadResult } from "../utils/cloudinary.js";
 import { apiResponse } from "../utils/apiResponse.js";
+// import { upload } from "../middlewares/multer.middleware.js";
 
 const registerUser=asyncHandler(async(req,res)=>{
 
     //getting user details from frontend ...
     const {fullname,email,username,password}=req.body;
-    console.log("name: ", fullname,  "email is: ", email, "password: ",password);
+    console.log("fullname: ", fullname,  "email is: ", email, "password: ",password);
 
     //validation of details ...
     if([fullname, email, username, password].some((field)=>{
@@ -19,13 +20,13 @@ const registerUser=asyncHandler(async(req,res)=>{
     }
 
     //check user already exist or not (username and email)
-    const existeduser=User.findOne({
+    const existeduser= await User.findOne({
         $or:[{username}, {email}]
     })
     if(existeduser){
         throw new apiError(409, "user is existed, try with another")
     }
-
+    console.log(req.files);
     //check for images,check for avatar
     const avatarLocalPath=req.files?.avatar[0]?.path;
     const coverImageLocalPath=req.files?.coverImage[0]?.path;
@@ -46,8 +47,8 @@ const registerUser=asyncHandler(async(req,res)=>{
      //create user object -->create entry in db
     const user= await User.create({
         fullname,
-        avatar:uploadedAvatar.url,
-        coverImage: uploadedCoverImage?.url || "",
+        avatar:uploadedAvatar.secure_url,
+        coverImage: uploadedCoverImage?.secure_url || "",
         email,
         username: username.toLowerCase(),
         password
