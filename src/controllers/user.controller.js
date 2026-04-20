@@ -3,7 +3,7 @@ import apiError from "../utils/apiError.js";
 import { User } from "../models/user.model.js";
 import { uploadResult } from "../utils/cloudinary.js";
 import { apiResponse } from "../utils/apiResponse.js";
-import { jwt } from "jsonwebtoken";
+import jwt from "jsonwebtoken"
 import mongoose from "mongoose";
 // import { upload } from "../middlewares/multer.middleware.js";
 
@@ -220,7 +220,7 @@ const changeCurrentPassword=asyncHandler(async(req,res)=>{
 const getCurrentUser=asyncHandler(async(req,res)=>{
     return res
     .status(200)
-    .json(200,req.user, "fetched user detail successfully");
+    .json(new apiResponse(200,req.user, "fetched user detail successfully"));
 
 })
 
