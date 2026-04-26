@@ -96,8 +96,79 @@ const toggleTweetLike=asyncHandler(async(req,res)=>{
 
 
 //4. get all liked videos
+const getAllLikedVideos=asyncHandler(async(req,res)=>{
+    //to get all liked videos
+    //1. get logged in user id
+    const userId=req.user?._id;
+    if(!userId){
+        throw new apiError(401,"login first");
+    }
+    //get the videos liked by the user
+    const likedVideos=await Like.aggregate([
+        {
+            $match: {
+                likedBy: new mongoose.Types.ObjectId(userId),
+                video: {$exists:true, $ne:null},
+            }
+        },
+        //join. the vido models to get videos details using lookup
+        {
+            $lookup: {
+                from: "videos",
+                localField: "video",
+                foreignField: "_id",
+                as: "videoDetails",
+                //fetch user's details
+                pipeline: [
+                    {
+                        $lookup:{
+                            from: "users",
+                        localField: "owner",
+                        foreignField: "_id",
+                        as: "owner",
+                        pipeline: [
+                            {
+                                $project: {username:1,avatar:1,fullname:1},
+                            }
+                        ]
+                    }
+                    },
+                    {
+                        $unwind: {
+                            path: "$owner",
+                            preserveNullAndEmptyArrays: true  
+                        }
+                    },
+                ]
+            }
+
+        },
+        {
+            $unwind: {
+                path: "$videoDetails",
+                preserveNullAndEmptyArrays: true  
+            }
+        },
+        //only include published videos
+        {
+            $match: {
+                "videoDetails.isPublished": true,
+            },
+        },
+        //shape final output
+        {
+            $project: {
+                _id: 0,
+                video: "$videoDetails"
+            }
+        }
+
+    ])
+    return res
+    .status(200)
+    .json(new apiResponse(200, likedVideos, "got all liked videos"));
+})
 
 
 
-
-export{toggleVidoLike,toggleCommentLike,toggleTweetLike}
+export{toggleVidoLike,toggleCommentLike,toggleTweetLike,getAllLikedVideos}
