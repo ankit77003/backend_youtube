@@ -111,7 +111,7 @@ const getAllLikedVideos=asyncHandler(async(req,res)=>{
                 video: {$exists:true, $ne:null},
             }
         },
-        //join. the vido models to get videos details using lookup
+        //join. the video models to get videos details using lookup
         {
             $lookup: {
                 from: "videos",
